@@ -1,0 +1,16 @@
+{
+  "productos": [
+    {
+      " nombre": "lapiz",
+      " precio": 50,
+      "id": 1,
+      "url": "url"
+    },
+    {
+      "nombre": "liquid",
+      "precio": 100,
+      "url": "url",
+      "id": 2
+    }
+  ]
+}
