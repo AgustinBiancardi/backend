@@ -1,0 +1,19 @@
+extends layout
+
+block formu
+
+    h1(style="color:blue;")= "Ingrese un nuevo producto"
+    form(action="/productos" method="post") 
+        div 
+            label(for="nombre")= "Nombre" 
+            input(type="text" id="nombre" name="nombre")
+        div 
+            label(for="precio")= "Precio" 
+            input(type="number" id="precio" name="precio")
+        div 
+            label(for="imagen")= "Imagen" 
+            input(type="text" id="imagen" name="imagen")
+
+        button agregar
+    br
+    a(href="/productos")="Ver productos"

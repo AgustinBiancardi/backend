@@ -1,0 +1,16 @@
+extends layout
+
+block productos
+        .container
+            if productos.length > 0
+                h1 Productos
+                each producto in productos
+                    .col-xs-6.col-sm-4.col-md-3
+                        .users-box
+                            span.producto-name=producto.nombre
+                            span.producto-precio=producto.precio
+                            span.producto-imagen=producto.imagen
+                            br
+            else 
+                h1 No hay productos cargados
+        a(href="/") Ingresar nuevos productos 
