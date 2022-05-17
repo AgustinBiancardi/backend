@@ -1,0 +1,7 @@
+[
+    {
+        "nombre": "regla",
+        "precio": 50,
+        "imagen": "url"
+    }
+]
