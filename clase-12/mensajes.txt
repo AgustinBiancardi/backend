@@ -1,0 +1,17 @@
+[
+  {
+    "email": "agustinbiancardi02@gmail.com",
+    "text": "Bienvenidos al chat",
+    "fyh": "Tue May 17 2022"
+  },
+  {
+    "email": "otromail@gmail.com",
+    "text": "Otro mensaje que va a quedar para la historia",
+    "fyh": "Tue May 17 2022"
+  },
+  {
+    "email": "ultimo@gmail.com",
+    "text": "Como andan?",
+    "fyh": "Tue May 17 2022"
+  }
+]

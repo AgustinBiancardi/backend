@@ -18,9 +18,10 @@
         const socket = io.connect();
 
         function addMessage(e) {
-            const message = {
-                author: document.getElementById("username").value,
-                message: document.getElementById("text").value,
+            if(document.getElementById("username").value){
+                const message = {
+                email: document.getElementById("username").value,
+                text: document.getElementById("text").value,
                 fyh: new Date().toDateString()
             }
 
@@ -30,14 +31,35 @@
             document.getElementById("text").focus()
 
             return false
+            }else{
+                alert("Completa el campo de email!")
+            }
+            
+        }
+
+        function addProducto(e) {
+            const producto = {
+                nombre: document.getElementById("nombre").value,
+                precio: document.getElementById("precio").value,
+                imagen: document.getElementById("imagen").value
+            }
+
+            socket.emit("new-producto", producto);
+
+            document.getElementById("nombre").value = ""
+            document.getElementById("precio").value = ""
+            document.getElementById("imagen").value = ""
+            
+
+            return false
         }
 
         function rendermensajes(data) {
             const html = data.map((elem, index) => {
                 return (`<div>
-        <strong style="color:blue;">${elem.author}</strong>
+        <strong style="color:blue;">${elem.email}</strong>
         <em style="color:brown;">[${elem.fyh}]</em>
-        <em style="color:green;">${elem.message}</em>
+        <em style="color:green;">${elem.text}</em>
         </div>`)
             }).join(" ")
 
@@ -45,7 +67,6 @@
         }
 
         function renderproductos(data) {
-            console.log("Este es el producto" , data)
             const html = data.map((elem, index) => {
                 return (`
       <tr>
@@ -56,12 +77,12 @@
           ${elem.precio}
         </td>
         <td>
-          <img src="${elem.nombre}">
+          <img src="${elem.imagen}">
         </td>
       </tr>`)
             })
 
-            document.getElementById("tabla").innerHTML += html
+            document.getElementById("tabla").innerHTML = html
         }
 
         socket.on("messages", function (data) { rendermensajes(data) })

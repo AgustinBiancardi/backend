@@ -1,7 +1,12 @@
 [
-    {
-        "nombre": "regla",
-        "precio": 50,
-        "imagen": "url"
-    }
+  {
+    "nombre": "regla",
+    "precio": 50,
+    "imagen": "url"
+  },
+  {
+    "nombre": "lapiz",
+    "precio": 20,
+    "imagen": "url"
+  }
 ]
