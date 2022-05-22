@@ -1,0 +1,17 @@
+[
+  {
+    "id": 2,
+    "timestap": "Sun May 22 2022",
+    "items": [
+      {
+        "id": 1,
+        "timestap": "Sun May 22 2022",
+        "nombre": "Lapicera",
+        "descripcion": "Lapicera con la mejor resistencia y larga durabilidad, perfectos para el colegio.",
+        "codigo": "WQER",
+        "precio": "70",
+        "stock": "8"
+      }
+    ]
+  }
+]
