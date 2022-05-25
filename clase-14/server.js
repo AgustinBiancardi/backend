@@ -5,6 +5,7 @@ const fs = require("fs")
 const app = express()
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
 // RUTAS
 const routerProductos = new Router()
 const routerCarrito = new Router()
@@ -73,7 +74,7 @@ routerProductos.get('/:id?', async (req, res) => {
 
     res.send(productoSeleccionado)
 })
-let admin = true
+let admin = false
 // GUARDAR UN NUEVO PRODUCTO
 routerProductos.post('/', async (req, res) => {
     if (admin) {
@@ -94,7 +95,10 @@ routerProductos.post('/', async (req, res) => {
         await actualizar("productos", datos)
         res.send({ mensaje: 'Producto guardado correctamente.' })
     } else {
-        return res.send({ error: 'Error. No puedes guardar un nuevo producto siendo usuario.' })
+        return res.send({ 
+            error: -1,
+            descripcion: `Ruta ${req.url} - Metodo ${req.method} no autorizada.`
+        })
     }
 })
 // ACTUALIZAR PRODUCTO POR ID
@@ -131,7 +135,10 @@ routerProductos.put('/:id', async (req, res) => {
             await actualizar("productos", datos)
         }
     } else {
-        return res.send({ error: 'Error. No puedes realizar esta acción siendo usuario.' })
+        return res.send({ 
+            error: -1,
+            descripcion: `Ruta ${req.url} - Metodo ${req.method} no autorizada.`
+        })
     }
 })
 // ELIMINAR PRODUCTO POR ID
@@ -146,7 +153,10 @@ routerProductos.delete('/:id', async (req, res) => {
             await actualizar("productos", datos)
         }
     } else {
-        return res.send({ error: 'Error. No puedes actualizar un prducto siendo usuario.' })
+        return res.send({ 
+            error: -1,
+            descripcion: `Ruta ${req.url} - Metodo ${req.method} no autorizada.`
+        })
     }
 
 })
@@ -282,11 +292,19 @@ routerCarrito.delete('/:id/productos/:id_prod', async (req, res) => {
     }
 })
 
+
 // Carga de Routers
 
 app.use('/api/productos', routerProductos)
 app.use('/api/carrito', routerCarrito)
 
+app.use((req,res)=>{
+    const mensaje = `Ruta ${req.url} - Método ${req.method} no implementado`
+    res.status(404).json({
+        error: -2,
+        descripcion:mensaje
+    })
+})
 // Levantar Server
 
 const PORT = process.env.PORT || 8080
