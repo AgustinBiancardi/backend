@@ -68,12 +68,12 @@ app.get('/', (req, res) => {
     res.render('productos', null)
 })
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log('Un cliente se ha conectado!')
     let catalogo = new Contenedor("./productos.txt")
     let chat = new Contenedor("./mensajes.txt")
-    buscar(catalogo)
-    buscarmensajes(chat)
+    await buscar(catalogo)
+    await buscarmensajes(chat)
     socket.emit('messages', messages)
     socket.emit('productos', productos)
 
