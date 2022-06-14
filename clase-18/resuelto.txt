@@ -1,0 +1,28 @@
+1- db.productos.insertMany([{nombre: "Lapiz",descripcion: "Envíos Gratis en el día ✓ Comprá Lapices en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "AB-11",precio: 300,stock: "65"},{nombre: "Lapicera",descripcion: "Envíos Gratis en el día ✓ Comprá Lapiceras en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "AT-90",precio: 789,stock: "3"},{nombre: "Gomas",descripcion: "Envíos Gratis en el día ✓ Comprá Gomas en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "AG-67",precio: 450,stock: 8},{nombre: "Carpetas",descripcion: "Envíos Gratis en el día ✓ Comprá Carpetas en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "HG-59",precio: 678,stock: 34},{nombre: "Voligomas",descripcion: "Envíos Gratis en el día ✓ Comprá Voligomas en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "PK-77",precio: "1584",stock: 23},{nombre: "Hojas A4",descripcion: "Envíos Gratis en el día ✓ Comprá Hojas A4 en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "ER-82",precio: 2501,stock: 78},{nombre: "Hojas de colores",descripcion: "Envíos Gratis en el día ✓ Comprá Hojas de colores en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "YT-21",precio: 2900,stock: 5},{nombre: "Tijeras",descripcion: "Envíos Gratis en el día ✓ Comprá Tijeras en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "CT-18",precio: 100,stock: 1},{nombre: "Marcadores",descripcion: "Envíos Gratis en el día ✓ Comprá Marcadores en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "AB-17",precio: 4990,stock: 90},{nombre: "Cartucheras",descripcion: "Envíos Gratis en el día ✓ Comprá Cartucheras en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "RO-10",precio: 3620,stock: 59}])
+   db.mensajes.insertMany([{email: "agustinbiancardi02@gmail.com",text: "Bienvenidos al chat",fyh: "Tue May 17 2022"},{email: "otromail@gmail.com",text: "Otro mensaje que va a quedar para la historia",fyh: "Tue May 17 2022"},{email: "ultimo@gmail.com",text: "Como andan?",fyh: "Tue May 17 2022"},{email: "julian@gmail.com",text: "Me voy de casa a la tarde vuelvo",fyh: "Sun Jun 11 2022"},{email: "nicolas@gmail.com",text: "Nosotros nos vamos a Junìn, cuidense",fyh: "Sun Jun 11 2022"},{email: "ruben@gmail.com",text: "Cierren las persianas asi no entra frio!",fyh: "Sun Jun 11 2022"},{email: "silvia@gmail.com",text: "Esta muy comodo el viaje el tren, super recomiendo",fyh: "Sun Jun 11 2022"},{email: "agustinbiancardi02@gmail.com",text: "Ya retire la entrada para ver a River",fyh: "Sun Jun 11 2022"},{email: "nicolas@gmail.com",text: "Nosotros vamos a ir a la cancha del verde",fyh: "Sun Jun 11 2022"},{email: "agustinbiancardi02@gmail.com",text: "Que la pasen bien!",fyh: "Sun Jun 11 2022"}])
+
+3- db.productos.find()
+   db.mensajes.find()
+
+4- db.productos.estimatedDocumentCount()
+   db.mensajes.estimatedDocumentCount()
+
+5.a- db.productos.insertOne({nombre: "Sacapuntas",descripcion: "Envíos Gratis en el día ✓ Comprá Sacapuntas en cuotas sin interés! Conocé nuestras increíbles ofertas y promociones en millones de productos.",codigo: "OP-21",precio: 4500,stock: 64})
+
+5.b.I  db.productos.find({precio: {$lt: 1000}})
+
+5.b.II db.productos.find({$and: [{"precio": {$gt: 1000}},{precio: {$lt: 3000}}]}) 
+               
+
+5.b.III db.productos.find({precio: {$gt: 3000}})
+
+5.b.IV db.productos.find({},{"nombre":1,"_id":0}).sort({precio: 1}).limit(1).skip(2) 
+
+5.c db.productos.updateMany({},{$set:{"stock":100}}) 
+
+5.d db.productos.updateMany({"precio": { $gt: 4000}},{$set: {"precio": 0}}) 
+
+5.e db.productos.deleteMany({precio: {$lt: 1000}})
+
+6.  db.createUser({user: 'pepe',pwd: 'asd456',roles: [{role: 'read',db: 'ecommerce'}]})
+    db.createUser({user: "pepe2",pwd: "asd4567",roles: [{ role: "read", db: "ecommerce" }]})
