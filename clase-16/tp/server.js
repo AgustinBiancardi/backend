@@ -8,9 +8,11 @@ import express from 'express'
 
 const sqlProd = new SQL(options)
 const sqlMens = new SQL(optionsqlite)
-
-sqlProd.crearTablaP()
-sqlMens.crearTabla()
+async function createTables (){
+    await sqlProd.crearTablaP()
+    await sqlMens.crearTabla() 
+}
+createTables()
 const app = express()
 
 app.engine('handlebars', handlebars.engine())
