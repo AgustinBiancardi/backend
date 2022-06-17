@@ -1,18 +1,21 @@
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import handlebars from 'express-handlebars'
-import { options } from './options/mysqlconfig.js'
-import { optionsqlite } from './options/sqlite.js'
-import SQL from './sql.js'
+// import { options } from './options/mysqlconfig.js'
+// import { optionsqlite } from './options/sqlite.js'
+// import SQL from './sql.js'
 import express from 'express'
+import {tableProduct, tableMessages} from './sql.js'
 
-const sqlProd = new SQL(options)
-const sqlMens = new SQL(optionsqlite)
+// const sqlProd = new SQL(options)
+// const sqlMens = new SQL(optionsqlite)
 async function createTables (){
-    await sqlProd.crearTablaP()
-    await sqlMens.crearTabla() 
+    await tableProduct.crearTablaP()
+    await tableMessages.crearTabla() 
+    console.log('tablas creadas!')
 }
 createTables()
+
 const app = express()
 
 app.engine('handlebars', handlebars.engine())
@@ -32,20 +35,20 @@ app.get('/', (req, res) => {
 
 io.on('connection', async (socket) => {
     console.log('Un cliente se ha conectado!')
-    productos = await sqlProd.getAll()
-    messages = await sqlMens.getAllM()
+    productos = await tableProduct.getAll()
+    messages = await tableMessages.getAllM()
     socket.emit('messages', messages)
     socket.emit('productos', productos)
 
     socket.on('new-message', async data => {
-        await sqlMens.insertMensaje(data)
-        messages = await sqlMens.getAllM()
+        await tableMessages.insertMensaje(data)
+        messages = await tableMessages.getAllM()
         io.sockets.emit('messages', messages)
     })
 
     socket.on('new-producto', async data => {
-        await sqlProd.insertProducto(data)
-        productos = await sqlProd.getAll()
+        await tableProduct.insertProducto(data)
+        productos = await tableProduct.getAll()
         io.sockets.emit('productos', productos)
     })
 })
