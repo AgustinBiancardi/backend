@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.min.js"></script> 
+    <title>Productos</title>
+</head>
+
+<body>
+    
+    {{{body}}}
+    <script>
+        
+        const socket = io.connect();
+        let idcount 
+        function addMessage(e) {
+           
+            if(document.getElementById("username").value){
+                const data = {
+                    author: {
+                        id: document.getElementById("username").value,
+                        nombre: document.getElementById("nombre").value,
+                        apellido: document.getElementById("apellido").value,
+                        edad: Number(document.getElementById("edad").value),
+                        alias: document.getElementById("alias").value,
+                        avatar: document.getElementById("avatar").value
+                    },
+                    text: document.getElementById("text").value,
+                    id: idcount
+                    
+                }
+          
+             socket.emit("new-message",data);
+
+             document.getElementById("text").value = ""
+             document.getElementById("text").focus()
+             return false
+            }
+        }
+        
+        function rendermensajes(data,array) {
+            console.log("hola esto es ",data)
+            idcount = array.length + 1
+            
+            
+            const html = array.map((elem, index) => {
+                return (`<div>
+        <strong style="color:blue;">${elem.author.nombre}</strong>
+        <em style="color:brown;">[${elem.author.alias}]</em>
+        <em style="color:green;">${elem.text}</em>
+        </div>`)
+            }).join(" ")
+
+            document.getElementById("messages").innerHTML = html
+            
+        }
+        
+        function renderproductos(data) {
+            const html = data.map((elem, index) => {
+                return (`
+      <tr>
+        <td>
+          ${elem.nombre}
+        </td>
+        <td>
+          ${elem.precio}
+        </td>
+        <td>
+          <img width='40px' height='40px' src="${elem.foto}">
+        </td>
+      </tr>`)
+            })
+
+            document.getElementById("tabla").innerHTML = html
+            
+        }
+        socket.on("messages", function (data,array) { rendermensajes(data,array) })
+        socket.on("productos", function (data) { renderproductos(data) })
+        
+    </script>
+</body>
+
+</html>
