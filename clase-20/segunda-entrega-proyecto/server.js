@@ -5,12 +5,14 @@ import { Router } from 'express'
 import admin from 'firebase-admin'
 import fs from 'fs';
 import { type } from 'os';
+import { response } from 'express';
 
 //CONEXIÓN A FIREBASE
 const serviceAccount = JSON.parse(fs.readFileSync("./db/ecommerce-backend-229e4-firebase-adminsdk-9qqp0-eb4d53f58f.json"));
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+const firestoreA = admin.firestore()
+firestoreA.settings({ ignoreUndefinedProperties: true })
 console.log("Conectado a firebase correctamente")
-
 //CONEXIÓN A MONGO
 connectToMongo()
 async function connectToMongo() {
@@ -42,11 +44,8 @@ routerProductos.get('/', async (req, res) => {
 routerProductos.get('/:id', async (req, res) => {
     const idProd = parseInt(req.params.id)
     let productos = await models.productos.find();
-    let hecho = mensaje(idProd, res, productos)
-    if (hecho) {
-        productos = await models.productos.find({ id: idProd });
-        res.send(productos)
-    }
+    productos = await models.productos.find({ id: idProd });
+    res.send(productos)
 })
 
 let adminpermisos = true
@@ -90,11 +89,10 @@ routerProductos.put('/:id', async (req, res) => {
             precio: req.body.precio,
             stock: req.body.stock
         }
-        let hecho = mensaje(id, res, productos)
-        if (hecho) {
-            await models.productos.findOneAndUpdate({ id: id }, newproducto);
-            res.send({ mensaje: 'Producto actualizado correctamente.' })
-        }
+
+        await models.productos.findOneAndUpdate({ id: id }, newproducto);
+        res.send({ mensaje: 'Producto actualizado correctamente.' })
+
     } else {
         return res.send({
             error: -1,
@@ -108,11 +106,9 @@ routerProductos.delete('/:id', async (req, res) => {
     if (adminpermisos) {
         let productos = await models.productos.find();
         const id = parseInt(req.params.id)
-        let hecho = mensaje(id, res, productos)
-        if (hecho) {
-            await models.productos.deleteOne({ id: id })
-            res.send({ mensaje: 'Producto eliminado correctamente' })
-        }
+        await models.productos.deleteOne({ id: id })
+        res.send({ mensaje: 'Producto eliminado correctamente' })
+
     } else {
         return res.send({
             error: -1,
@@ -121,35 +117,19 @@ routerProductos.delete('/:id', async (req, res) => {
     }
 })
 
-//MENSAJES GENERICOS
-function mensaje(id, res, array) {
-    let arrId = []
-    array.forEach(element => {
-        arrId.push(Number(element.id))
-    });
-    let found = arrId.find(element => element === id);
-    if (isNaN(id)) {
-        res.send({ error: 'Error. Especifica un id numerico.' })
-        return false
-    } else if (!found) {
-        res.send({ error: 'Error. El id especificado no se encuentra.' })
-        return false
-    } else {
-        return true
-    }
-}
-
 //ROUTER CARRITO
 routerCarrito.post('/', async (req, res) => {
     const db = admin.firestore();
     const query = db.collection("carritos");
     let idCarrito
     const carritos = await query.get()
+    // console.log('carritos: ', carritos)
     let docs = carritos.docs
-    docs.length === 0 ? idCarrito = 1 : idCarrito = Number(docs[docs.length - 1].id) + 1
+    docs.length === 0 ? idCarrito = 1 : idCarrito = Number(docs[docs.length - 1].id) + 2
     console.log(idCarrito)
     let doc = query.doc(`${idCarrito}`)
-    await doc.create({ timestap: new Date().toDateString(), items: [] })
+    const { items } = req.body
+    await doc.create({ items })
     res.send({ mensaje: 'ok' })
 })
 
@@ -161,89 +141,73 @@ routerCarrito.delete('/:id', async (req, res) => {
     const carritos = await query.get()
     let docs = carritos.docs
     console.log(docs)
-    let hecho = mensaje(id, res, docs)
-    if (hecho) {
-        let doc = query.doc(`${id}`)
-        const item = await doc.delete()
+    let doc = query.doc(`${id}`)
+    const item = await doc.delete()
 
-        res.send({ mensaje: 'El carrito ha sido borrado correctamente' })
-    }
+    res.send({ mensaje: 'El carrito ha sido borrado correctamente' })
 })
 
 //AGREGAR PRODUCTOS A UN CARRITO
-routerCarrito.post('/:id/productos/:id_prod', async (req, res) => {
-    const id = parseInt(req.params.id)
-    const id_prod = parseInt(req.params.id_prod)
+routerCarrito.put('/:id/productos', async (req, res) => {
+    const id = req.params.id
+    const { items } = req.body;
+    try {
+        const db = admin.firestore();
+        const query = db.collection("carritos");
+        let item = await models.productos.findOne({ _id: items })
 
-    const db = admin.firestore();
-    const query = db.collection("carritos");
-    const carritos = await query.get()
-    let docs = carritos.docs
+        console.log('item en bd---->', item)
+        let ref = query.doc(id);
+        const itemm = await ref.get()
+        const response = itemm.data()
+        console.log('carrito-->', response)
+        let arrayItems = response.items
+        await ref.update({ items: arrayItems.concat(items) })
+        res.send({ mensaje: "Tu producto ha sido guardado correctamente" })
 
-    let productos = await models.productos.find();
 
-    let hechoC = mensaje(id, res, docs)
-    if (hechoC) {
-        let hechoP = mensaje(id_prod, res, productos)
-        if (hechoP) {
-            let productoSeleccionado = productos = await models.productos.findOne({ id: id_prod })
-            let doc = query.doc(`${id}`);
-            const itemm = await doc.get()
-            const response = itemm.data()
-            let items = response.items
-            items.push(productoSeleccionado)
-            await doc.update({ items: items })
-            res.send({ mensaje: "Tu producto ha sido guardado correctamente" })
-        }
+    } catch (error) {
+        console.log(error.message)
     }
 })
 
 //VER LOS PRODUCTOS POR ID DE CARRITO
 routerCarrito.get('/:id/productos', async (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     const db = admin.firestore();
     const query = db.collection("carritos");
     const carritos = await query.get()
     let docs = carritos.docs
 
-    let hecho = mensaje(id, res, docs)
-    if (hecho) {
-        let doc = query.doc(`${id}`);
-        const itemm = await doc.get()
-        const response = itemm.data()
-        let items = response.items
-        res.send({mensaje: items})
-    }
+    let doc = query.doc(`${id}`);
+    const itemm = await doc.get()
+    const response = itemm.data()
+    let items = response.items
+    let item = await models.productos.findOne({ _id: items })
+    res.json(items)
 })
 
 //ELIMINAR PRODUCTOS DE UN CARRITO
 routerCarrito.delete('/:id/productos/:id_prod', async (req, res) => {
-    const id = parseInt(req.params.id)
-    const id_prod = parseInt(req.params.id_prod)
-    await buscar("carrito")
-    await buscar("productos")
+    const id = req.params.id
+    const { id_prod } = req.params
+    try {
+        const db = admin.firestore();
+        const query = db.collection("carritos");
 
-    let hechoC = mensaje(id, res, "carrito")
-    if (hechoC) {
-        let hechoP = mensaje(id_prod, res, "productos")
-        if (hechoP) {
-            let carritoSeleccionado
-            datosCarrito.forEach(element => {
-                if (element.id === id) {
-                    carritoSeleccionado = element
-                }
-            });
+        let item = await models.productos.findOne({ _id: id_prod })
+        let ref = query.doc(id);
+        const itemm = await ref.get()
+        const response = itemm.data()
+        let arrayItems = response.items
+        console.log(arrayItems)
+        arrayItems = arrayItems.filter(element => element != id_prod)
+        await ref.update({ items: arrayItems })
+        res.send({ mensaje: "Tu producto ha sido eliminado correctamente" })
 
-            carritoSeleccionado.items = carritoSeleccionado.items.filter(element => element.id != id_prod);
+    } catch (error) {
+        console.log(error.message)
 
-            res.send(carritoSeleccionado)
-            for (let i = 0; i < datosCarrito.length; i++) {
-                if (datosCarrito[i].id === id) {
-                    datosCarrito[i] = carritoSeleccionado
-                }
-            }
-            await actualizar("carrito", datosCarrito)
-        }
     }
 })
 
