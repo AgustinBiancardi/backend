@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
 
 app.post('/productos', (req, res) => {
     productos.push(req.body) 
+    console.log(req.body)
     res.redirect('/')
 })
 
